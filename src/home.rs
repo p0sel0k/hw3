@@ -2,13 +2,14 @@ use std::collections::HashMap;
 
 use crate::devices::SmartDevice;
 pub(crate) struct Home {
+    _name: String,
     rooms: HashMap<String, Room>,
 }
 
 impl Home {
     pub(crate) fn new(name: String) -> Self {
         let rooms = HashMap::new();
-        Home { rooms }
+        Home { _name: name, rooms }
     }
 
     pub(crate) fn add_room(&mut self, room: Room) {
