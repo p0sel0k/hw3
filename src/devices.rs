@@ -1,16 +1,16 @@
-pub(crate) trait SmartDevice {
+pub trait SmartDevice {
     fn name(&self) -> &str;
     fn print_state(&self);
 }
 
-pub(crate) struct SmartSocket {
+pub struct SmartSocket {
     name: String,
     is_switched_on: bool,
     power: i32,
 }
 
 impl SmartSocket {
-    pub(crate) fn new(name: String) -> Self {
+    pub fn new(name: String) -> Self {
         SmartSocket {
             name,
             is_switched_on: false,
@@ -18,15 +18,15 @@ impl SmartSocket {
         }
     }
 
-    pub(crate) fn switch_on(&mut self) {
+    pub fn switch_on(&mut self) {
         self.is_switched_on = true;
     }
 
-    pub(crate) fn switch_off(&mut self) {
+    pub fn switch_off(&mut self) {
         self.is_switched_on = false;
     }
 
-    pub(crate) fn power(&self) -> Option<i32> {
+    pub fn power(&self) -> Option<i32> {
         if self.is_switched_on {
             Some(self.power)
         } else {
@@ -49,20 +49,20 @@ impl SmartDevice for SmartSocket {
     }
 }
 
-pub(crate) struct SmartThermometer {
+pub struct SmartThermometer {
     name: String,
     temperature: i32,
 }
 
 impl SmartThermometer {
-    pub(crate) fn new(name: String) -> Self {
+    pub fn new(name: String) -> Self {
         SmartThermometer {
             name,
             temperature: 25,
         }
     }
 
-    pub(crate) fn get_temperature(&self) -> i32 {
+    pub fn get_temperature(&self) -> i32 {
         self.temperature
     }
 }

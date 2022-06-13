@@ -1,23 +1,22 @@
-use std::collections::HashMap;
-
 use crate::devices::SmartDevice;
-pub(crate) struct Home {
+use std::collections::HashMap;
+pub struct Home {
     _name: String,
     rooms: HashMap<String, Room>,
 }
 
 impl Home {
-    pub(crate) fn new(name: String) -> Self {
+    pub fn new(name: String) -> Self {
         let rooms = HashMap::new();
         Home { _name: name, rooms }
     }
 
-    pub(crate) fn add_room(&mut self, room: Room) {
+    pub fn add_room(&mut self, room: Room) {
         self.rooms.insert(room.name.clone(), room);
         println!("The room has been succesfully added")
     }
 
-    pub(crate) fn add_device(&mut self, room_name: &String, device: Box<dyn SmartDevice>) {
+    pub fn add_device(&mut self, room_name: &String, device: Box<dyn SmartDevice>) {
         match self.get_room(room_name) {
             Some(room) => {
                 room.add_device(device);
@@ -30,7 +29,7 @@ impl Home {
         }
     }
 
-    pub(crate) fn get_room(&mut self, name: &str) -> Option<&mut Room> {
+    pub fn get_room(&mut self, name: &str) -> Option<&mut Room> {
         for (room_name, room) in &mut self.rooms {
             if room_name == name {
                 return Some(room);
@@ -39,7 +38,7 @@ impl Home {
         None
     }
 
-    pub(crate) fn remove_room(&mut self, name: &str) -> Option<Room> {
+    pub fn remove_room(&mut self, name: &str) -> Option<Room> {
         match self.rooms.remove(name) {
             Some(room) => return Some(room),
             None => println!("There is no room: '{}' in home", name),
@@ -47,7 +46,7 @@ impl Home {
         None
     }
 
-    pub(crate) fn remove_device(
+    pub fn remove_device(
         &mut self,
         room_name: &String,
         device_name: &str,
@@ -58,8 +57,7 @@ impl Home {
         }
         None
     }
-
-    pub(crate) fn print_all_info(&self) {
+    pub fn print_all_info(&self) {
         for (name, room) in &self.rooms {
             println!("Room {} info", name);
             room.devices_state();
@@ -67,16 +65,16 @@ impl Home {
     }
 }
 
-pub(crate) struct Room {
+pub struct Room {
     name: String,
     devices: HashMap<String, Box<dyn SmartDevice>>,
 }
 
 impl Room {
-    pub(crate) fn new(name: String) -> Self {
+    pub fn new(name: String) -> Self {
         Room {
-            name,
             devices: HashMap::new(),
+            name,
         }
     }
 
@@ -84,10 +82,10 @@ impl Room {
         self.devices.insert(device.name().to_string(), device);
     }
 
-    fn _get_device(&mut self, name: &str) -> Option<&mut Box<dyn SmartDevice>> {
-        for (device_name, device) in &mut self.devices {
+    fn _get_device(&mut self, name: &str) -> Option<&dyn SmartDevice> {
+        for (device_name, device) in &self.devices {
             if device_name == name {
-                return Some(device);
+                return Some(device.as_ref());
             }
         }
         None

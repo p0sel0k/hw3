@@ -1,8 +1,5 @@
-mod devices;
-mod home;
-
-use devices::{SmartSocket, SmartThermometer};
-use home::{Home, Room};
+use smarthome::{Home, Room};
+use smarthome::{SmartSocket, SmartThermometer};
 
 fn main() {
     let mut home = Home::new("home".to_string());
