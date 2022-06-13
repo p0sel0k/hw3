@@ -105,3 +105,6 @@ impl Room {
         }
     }
 }
+
+#[cfg(test)]
+mod test {}
