@@ -72,6 +72,7 @@ impl Home {
         None
     }
     pub fn print_all_info(&self) {
+        println!("\n---------Home Report--------");
         for (name, room) in &self.rooms {
             println!("Room {} info", name);
             room.devices_state();
