@@ -88,4 +88,29 @@ impl SmartDevice for SmartThermometer {
 }
 
 #[cfg(test)]
-mod test {}
+mod test {
+    use crate::SmartSocket;
+
+    fn init_smart_socket() -> SmartSocket {
+        SmartSocket::new("test_device".into())
+    }
+
+    #[test]
+    fn get_socket_power() {
+        let mut socket = init_smart_socket();
+        socket.switch_on();
+        match socket.power() {
+            Ok(power) => assert_eq!(power, 220),
+            Err(_) => panic!("Socket is turned on"),
+        }
+    }
+    #[test]
+    #[should_panic]
+    fn get_turned_off_socket_power() {
+        let socket = init_smart_socket();
+        match socket.power() {
+            Ok(power) => assert_eq!(power, 220),
+            Err(_) => panic!("Socket is turned on"),
+        }
+    }
+}
