@@ -175,6 +175,7 @@ mod test {
             None => panic!("Can't remove device!!!"),
         }
     }
+
     #[test]
     fn remove_nonexisting_device() {
         let mut room = create_room();

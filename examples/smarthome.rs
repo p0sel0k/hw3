@@ -49,11 +49,11 @@ fn main() {
     match home.remove_room(&first_room_name) {
         Ok(_) => println!("Room: '{}' has been deleted", first_room_name),
         Err(err) => println!("Error: {}", err),
-    };
+    }
     match home.remove_room("not_existed_room") {
         Ok(_) => println!("Room: 'not_existed_room' has been deleted"),
         Err(err) => println!("Error: {}", err),
-    };
+    }
 
     //remove devices
     home.remove_device("not_existed_room", "socket2");

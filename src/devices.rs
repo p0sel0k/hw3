@@ -117,6 +117,7 @@ mod test {
             Err(_) => panic!("Socket is turned on"),
         }
     }
+
     #[test]
     #[should_panic]
     fn get_turned_off_socket_power() {
