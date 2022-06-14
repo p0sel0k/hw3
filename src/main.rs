@@ -14,14 +14,12 @@ fn main() {
     println!("{}: {}", &second_room_name, home.add_room(second_room));
 
     let mut socket1 = SmartSocket::new("socket1".to_string());
-    let mut socket2 = SmartSocket::new("socket2".to_string());
+    let socket2 = SmartSocket::new("socket2".to_string());
     let mut socket3 = SmartSocket::new("socket3".to_string());
     let thermometer1 = SmartThermometer::new("t1".to_string());
-    let termometer2 = SmartThermometer::new("t2".to_string());
 
     socket1.switch_on();
-    socket2.switch_on();
-    socket3.switch_off();
+    socket3.switch_on();
 
     match home.add_device(&first_room_name, Box::new(socket1)) {
         Ok(_) => println!("Socket1 has been added to room: '{}'", first_room_name),
@@ -44,13 +42,6 @@ fn main() {
             _ => println!("Unknown ERROR!"),
         },
     }
-    match home.add_device(&first_room_name, Box::new(termometer2)) {
-        Ok(_) => println!("Thermometer2 has been added to room: '{}'", first_room_name),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
-            _ => println!("Unknown ERROR!"),
-        },
-    }
     match home.add_device(&second_room_name, Box::new(socket3)) {
         Ok(_) => println!("Socket3 has been added to room: '{}'", second_room_name),
         Err(err) => match err {
@@ -58,26 +49,5 @@ fn main() {
             _ => println!("Unknown ERROR!"),
         },
     }
-
-    match home.remove_room(&first_room_name) {
-        Ok(_) => println!("Room: '{}' has been deleted", first_room_name),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
-            _ => println!("Unknown ERROR!"),
-        },
-    };
-    match home.remove_room("not_existed_room") {
-        Ok(_) => println!("Room: 'not_existed_room' has been deleted"),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No 'not_existed_room' in home"),
-            _ => println!("Unknown ERROR!"),
-        },
-    };
-
-    home.remove_device("not_existed_room", "socket2");
-    home.remove_device(&second_room_name, "not_existed_socket");
-
     home.print_all_info();
-
-    home.remove_device(&first_room_name, "socket2");
 }
