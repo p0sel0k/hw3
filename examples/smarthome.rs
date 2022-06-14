@@ -1,4 +1,4 @@
-use smarthome::{Home, HomeError, Room};
+use smarthome::{Home, Room};
 use smarthome::{SmartSocket, SmartThermometer};
 
 fn main() {
@@ -46,7 +46,6 @@ fn main() {
         Ok(_) => println!("Socket3 has been added to room: '{}'", second_room_name),
         Err(err) => println!("Error: {}", err),
     }
-
     match home.remove_room(&first_room_name) {
         Ok(_) => println!("Room: '{}' has been deleted", first_room_name),
         Err(err) => println!("Error: {}", err),

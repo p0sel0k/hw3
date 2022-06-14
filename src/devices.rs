@@ -1,7 +1,24 @@
+use std::error::Error;
+use std::fmt::Display;
+
+#[derive(Debug)]
 pub enum DeviceError {
     DeviceIsTurnedOff(&'static str),
     UnusedError,
 }
+
+impl Display for DeviceError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DeviceError::DeviceIsTurnedOff(msg) => {
+                write!(f, "Device Is Turned Off \n>>>> Cause: {}", msg)
+            }
+            DeviceError::UnusedError => write!(f, "UnusedError"),
+        }
+    }
+}
+
+impl Error for DeviceError {}
 
 pub trait SmartDevice {
     fn name(&self) -> &str;
@@ -49,11 +66,7 @@ impl SmartDevice for SmartSocket {
         println!(">> Socket name is: {}", self.name());
         match self.power() {
             Ok(p) => println!(">>>> Socket power is '{}'", p),
-            Err(e) => {
-                if let DeviceError::DeviceIsTurnedOff(msg) = e {
-                    println!(">>>> {}", msg)
-                }
-            }
+            Err(e) => println!(">>>> Error: {}", e),
         }
     }
 }
