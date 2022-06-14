@@ -28,53 +28,32 @@ fn main() {
     //add devices in room
     match home.add_device(&first_room_name, Box::new(socket1)) {
         Ok(_) => println!("Socket1 has been added to room: '{}'", first_room_name),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
-            _ => println!("Unknown ERROR!"),
-        },
+        Err(err) => println!("Error: {}", err),
     }
     match home.add_device(&first_room_name, Box::new(socket2)) {
         Ok(_) => println!("Socket2 has been added to room: '{}'", first_room_name),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
-            _ => println!("Unknown ERROR!"),
-        },
+        Err(err) => println!("Error: {}", err),
     }
     match home.add_device(&first_room_name, Box::new(thermometer1)) {
         Ok(_) => println!("Thermometer1 has been added to room: '{}'", first_room_name),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
-            _ => println!("Unknown ERROR!"),
-        },
+        Err(err) => println!("Error: {}", err),
     }
     match home.add_device(&first_room_name, Box::new(termometer2)) {
         Ok(_) => println!("Thermometer2 has been added to room: '{}'", first_room_name),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
-            _ => println!("Unknown ERROR!"),
-        },
+        Err(err) => println!("Error: {}", err),
     }
     match home.add_device(&second_room_name, Box::new(socket3)) {
         Ok(_) => println!("Socket3 has been added to room: '{}'", second_room_name),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", second_room_name),
-            _ => println!("Unknown ERROR!"),
-        },
+        Err(err) => println!("Error: {}", err),
     }
 
     match home.remove_room(&first_room_name) {
         Ok(_) => println!("Room: '{}' has been deleted", first_room_name),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
-            _ => println!("Unknown ERROR!"),
-        },
+        Err(err) => println!("Error: {}", err),
     };
     match home.remove_room("not_existed_room") {
         Ok(_) => println!("Room: 'not_existed_room' has been deleted"),
-        Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No 'not_existed_room' in home"),
-            _ => println!("Unknown ERROR!"),
-        },
+        Err(err) => println!("Error: {}", err),
     };
 
     //remove devices

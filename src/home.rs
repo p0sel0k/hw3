@@ -1,11 +1,28 @@
 use crate::devices::SmartDevice;
 use std::collections::HashMap;
+use std::error::Error;
+use std::fmt::Display;
 
+#[derive(Debug)]
 pub enum HomeError {
     NoRoomInHoom(String),
     NoDeviceInRoom(String),
     CantAddRoom,
 }
+
+impl Display for HomeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            HomeError::NoRoomInHoom(msg) => write!(f, "No Room In Home \nCause: {}", msg),
+            HomeError::NoDeviceInRoom(msg) => write!(f, "No Device In Room \nCause: {}", msg),
+            HomeError::CantAddRoom => write!(f, "Can't Add Room"),
+        }
+    }
+}
+
+impl Error for HomeError {}
+
+#[derive(Default)]
 pub struct Home {
     _name: String,
     rooms: HashMap<String, Room>,
@@ -63,14 +80,11 @@ impl Home {
     ) -> Option<Box<dyn SmartDevice>> {
         match self.get_room(room_name) {
             Ok(room) => return room.remove_device(device_name),
-            Err(e) => {
-                if let HomeError::NoRoomInHoom(msg) = e {
-                    println!("{}", msg)
-                }
-            }
+            Err(e) => println!("Error: {}", e),
         }
         None
     }
+
     pub fn print_all_info(&self) {
         println!("\n---------Home Report--------");
         for (name, room) in &self.rooms {
