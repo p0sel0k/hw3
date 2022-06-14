@@ -10,15 +10,8 @@ fn main() {
     let first_room = Room::new(first_room_name.clone());
     let second_room = Room::new(second_room_name.clone());
 
-    match home.add_room(first_room) {
-        Ok(_) => println!("The first_room has been succesfully added"),
-        Err(_) => println!("Can't add first_room"),
-    };
-
-    match home.add_room(second_room) {
-        Ok(_) => println!("The second_room has been succesfully added"),
-        Err(_) => println!("Can't add second_room"),
-    };
+    println!("{}: {}", &first_room_name, home.add_room(first_room));
+    println!("{}: {}", &second_room_name, home.add_room(second_room));
 
     let mut socket1 = SmartSocket::new("socket1".to_string());
     let mut socket2 = SmartSocket::new("socket2".to_string());
@@ -69,19 +62,19 @@ fn main() {
     match home.remove_room(&first_room_name) {
         Ok(_) => println!("Room: '{}' has been deleted", first_room_name),
         Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", second_room_name),
+            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
             _ => println!("Unknown ERROR!"),
         },
     };
     match home.remove_room("not_existed_room") {
-        Ok(_) => println!("Room: '{}' has been deleted", "not_existed_room"),
+        Ok(_) => println!("Room: 'not_existed_room' has been deleted"),
         Err(err) => match err {
-            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", second_room_name),
+            HomeError::NoRoomInHoom(_) => println!("No 'not_existed_room' in home"),
             _ => println!("Unknown ERROR!"),
         },
     };
 
-    home.remove_device(&"not_existed_room".to_string(), "socket2");
+    home.remove_device("not_existed_room", "socket2");
     home.remove_device(&second_room_name, "not_existed_socket");
 
     home.print_all_info();

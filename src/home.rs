@@ -17,16 +17,16 @@ impl Home {
         Home { _name: name, rooms }
     }
 
-    pub fn add_room(&mut self, room: Room) -> Result<(), HomeError> {
+    pub fn add_room(&mut self, room: Room) -> String {
         match self.rooms.insert(room.name.clone(), room) {
-            Some(_) => Ok(()),
-            None => Err(HomeError::CantAddRoom),
+            Some(old_room) => format!("Existed room was updated: {:?}", old_room),
+            None => "New room added".into(),
         }
     }
 
     pub fn add_device(
         &mut self,
-        room_name: &String,
+        room_name: &str,
         device: Box<dyn SmartDevice>,
     ) -> Result<(), HomeError> {
         let r = self.get_room(room_name)?;
@@ -48,7 +48,7 @@ impl Home {
 
     pub fn remove_room(&mut self, name: &str) -> Result<Room, HomeError> {
         match self.rooms.remove(name) {
-            Some(room) => return Ok(room),
+            Some(room) => Ok(room),
             None => Err(HomeError::NoRoomInHoom(format!(
                 "There is no room: '{}' in home",
                 name
@@ -58,7 +58,7 @@ impl Home {
 
     pub fn remove_device(
         &mut self,
-        room_name: &String,
+        room_name: &str,
         device_name: &str,
     ) -> Option<Box<dyn SmartDevice>> {
         match self.get_room(room_name) {
@@ -82,6 +82,12 @@ impl Home {
 pub struct Room {
     name: String,
     devices: HashMap<String, Box<dyn SmartDevice>>,
+}
+
+impl std::fmt::Debug for Room {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Room").field("name", &self.name).finish()
+    }
 }
 
 impl Room {
@@ -122,15 +128,26 @@ impl Room {
 
 #[cfg(test)]
 mod test {
-    use super::Room;
+    use super::{Home, Room};
     use crate::SmartSocket;
 
     fn create_device() -> SmartSocket {
         SmartSocket::new("test_device".into())
     }
 
+    fn create_home() -> Home {
+        Home::new("test_home".into())
+    }
+
     fn create_room() -> Room {
         Room::new("test_room".into())
+    }
+
+    #[test]
+    fn add_room() {
+        let mut home = create_home();
+        let room = create_room();
+        assert_eq!(home.add_room(room), "New room added");
     }
 
     #[test]
