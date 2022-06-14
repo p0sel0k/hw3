@@ -121,4 +121,36 @@ impl Room {
 }
 
 #[cfg(test)]
-mod test {}
+mod test {
+    use super::Room;
+    use crate::SmartSocket;
+
+    fn create_device() -> SmartSocket {
+        SmartSocket::new("test_device".into())
+    }
+
+    fn create_room() -> Room {
+        Room::new("test_room".into())
+    }
+
+    #[test]
+    fn remove_existing_device() {
+        let mut room = create_room();
+        let device = Box::new(create_device());
+        room.add_device(device);
+        match room.remove_device("test_device") {
+            Some(_) => (),
+            None => panic!("Can't remove device!!!"),
+        }
+    }
+    #[test]
+    fn remove_nonexisting_device() {
+        let mut room = create_room();
+        let device = Box::new(create_device());
+        room.add_device(device);
+        match room.remove_device("non-existent_device") {
+            Some(_) => panic!("Can't remove non-existent device!!!"),
+            None => (),
+        }
+    }
+}
