@@ -1,3 +1,8 @@
+pub enum DeviceError {
+    DeviceIsTurnedOff(&'static str),
+    UnusedError,
+}
+
 pub trait SmartDevice {
     fn name(&self) -> &str;
     fn print_state(&self);
@@ -26,11 +31,11 @@ impl SmartSocket {
         self.is_switched_on = false;
     }
 
-    pub fn power(&self) -> Option<i32> {
+    pub fn power(&self) -> Result<i32, DeviceError> {
         if self.is_switched_on {
-            Some(self.power)
+            Ok(self.power)
         } else {
-            None
+            Err(DeviceError::DeviceIsTurnedOff("Socket is off"))
         }
     }
 }
@@ -43,8 +48,12 @@ impl SmartDevice for SmartSocket {
     fn print_state(&self) {
         println!(">> Socket name is: {}", self.name());
         match self.power() {
-            Some(p) => println!(">>>> Socket power is '{}'", p),
-            None => println!(">>>> Socket is off"),
+            Ok(p) => println!(">>>> Socket power is '{}'", p),
+            Err(e) => {
+                if let DeviceError::DeviceIsTurnedOff(msg) = e {
+                    println!(">>>> {}", msg)
+                }
+            }
         }
     }
 }
@@ -77,3 +86,6 @@ impl SmartDevice for SmartThermometer {
         println!(">>>> Themperature is: {}", self.get_temperature());
     }
 }
+
+#[cfg(test)]
+mod test {}

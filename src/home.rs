@@ -1,5 +1,11 @@
 use crate::devices::SmartDevice;
 use std::collections::HashMap;
+
+pub enum HomeError {
+    NoRoomInHoom(String),
+    NoDeviceInRoom(String),
+    CantAddRoom,
+}
 pub struct Home {
     _name: String,
     rooms: HashMap<String, Room>,
@@ -11,39 +17,43 @@ impl Home {
         Home { _name: name, rooms }
     }
 
-    pub fn add_room(&mut self, room: Room) {
-        self.rooms.insert(room.name.clone(), room);
-        println!("The room has been succesfully added")
-    }
-
-    pub fn add_device(&mut self, room_name: &String, device: Box<dyn SmartDevice>) {
-        match self.get_room(room_name) {
-            Some(room) => {
-                room.add_device(device);
-                println!(
-                    "The device has been succesfully added in room: '{}'",
-                    room_name
-                )
-            }
-            None => println!("There is no room: '{}' in home", room_name),
+    pub fn add_room(&mut self, room: Room) -> Result<(), HomeError> {
+        match self.rooms.insert(room.name.clone(), room) {
+            Some(_) => Ok(()),
+            None => Err(HomeError::CantAddRoom),
         }
     }
 
-    pub fn get_room(&mut self, name: &str) -> Option<&mut Room> {
+    pub fn add_device(
+        &mut self,
+        room_name: &String,
+        device: Box<dyn SmartDevice>,
+    ) -> Result<(), HomeError> {
+        let r = self.get_room(room_name)?;
+        r.add_device(device);
+        Ok(())
+    }
+
+    pub fn get_room(&mut self, name: &str) -> Result<&mut Room, HomeError> {
         for (room_name, room) in &mut self.rooms {
             if room_name == name {
-                return Some(room);
+                return Ok(room);
             }
         }
-        None
+        Err(HomeError::NoRoomInHoom(format!(
+            "There is no room: '{}' in home",
+            name
+        )))
     }
 
-    pub fn remove_room(&mut self, name: &str) -> Option<Room> {
+    pub fn remove_room(&mut self, name: &str) -> Result<Room, HomeError> {
         match self.rooms.remove(name) {
-            Some(room) => return Some(room),
-            None => println!("There is no room: '{}' in home", name),
+            Some(room) => return Ok(room),
+            None => Err(HomeError::NoRoomInHoom(format!(
+                "There is no room: '{}' in home",
+                name
+            ))),
         }
-        None
     }
 
     pub fn remove_device(
@@ -52,8 +62,12 @@ impl Home {
         device_name: &str,
     ) -> Option<Box<dyn SmartDevice>> {
         match self.get_room(room_name) {
-            Some(room) => return room.remove_device(device_name),
-            None => println!("There is no room: '{}' in home", room_name),
+            Ok(room) => return room.remove_device(device_name),
+            Err(e) => {
+                if let HomeError::NoRoomInHoom(msg) = e {
+                    println!("{}", msg)
+                }
+            }
         }
         None
     }

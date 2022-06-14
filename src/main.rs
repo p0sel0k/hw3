@@ -1,4 +1,4 @@
-use smarthome::{Home, Room};
+use smarthome::{Home, HomeError, Room};
 use smarthome::{SmartSocket, SmartThermometer};
 
 fn main() {
@@ -10,8 +10,15 @@ fn main() {
     let first_room = Room::new(first_room_name.clone());
     let second_room = Room::new(second_room_name.clone());
 
-    home.add_room(first_room);
-    home.add_room(second_room);
+    match home.add_room(first_room) {
+        Ok(_) => println!("The first_room has been succesfully added"),
+        Err(_) => println!("Can't add first_room"),
+    };
+
+    match home.add_room(second_room) {
+        Ok(_) => println!("The second_room has been succesfully added"),
+        Err(_) => println!("Can't add second_room"),
+    };
 
     let mut socket1 = SmartSocket::new("socket1".to_string());
     let mut socket2 = SmartSocket::new("socket2".to_string());
@@ -23,14 +30,57 @@ fn main() {
     socket2.switch_on();
     socket3.switch_off();
 
-    home.add_device(&first_room_name, Box::new(socket1));
-    home.add_device(&first_room_name, Box::new(socket2));
-    home.add_device(&first_room_name, Box::new(thermometer1));
-    home.add_device(&first_room_name, Box::new(termometer2));
-    home.add_device(&second_room_name, Box::new(socket3));
+    match home.add_device(&first_room_name, Box::new(socket1)) {
+        Ok(_) => println!("Socket1 has been added to room: '{}'", first_room_name),
+        Err(err) => match err {
+            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
+            _ => println!("Unknown ERROR!"),
+        },
+    }
+    match home.add_device(&first_room_name, Box::new(socket2)) {
+        Ok(_) => println!("Socket2 has been added to room: '{}'", first_room_name),
+        Err(err) => match err {
+            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
+            _ => println!("Unknown ERROR!"),
+        },
+    }
+    match home.add_device(&first_room_name, Box::new(thermometer1)) {
+        Ok(_) => println!("Thermometer1 has been added to room: '{}'", first_room_name),
+        Err(err) => match err {
+            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
+            _ => println!("Unknown ERROR!"),
+        },
+    }
+    match home.add_device(&first_room_name, Box::new(termometer2)) {
+        Ok(_) => println!("Thermometer2 has been added to room: '{}'", first_room_name),
+        Err(err) => match err {
+            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", first_room_name),
+            _ => println!("Unknown ERROR!"),
+        },
+    }
+    match home.add_device(&second_room_name, Box::new(socket3)) {
+        Ok(_) => println!("Socket3 has been added to room: '{}'", second_room_name),
+        Err(err) => match err {
+            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", second_room_name),
+            _ => println!("Unknown ERROR!"),
+        },
+    }
 
-    home.remove_room(&first_room_name);
-    home.remove_room("not_existed_room");
+    match home.remove_room(&first_room_name) {
+        Ok(_) => println!("Room: '{}' has been deleted", first_room_name),
+        Err(err) => match err {
+            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", second_room_name),
+            _ => println!("Unknown ERROR!"),
+        },
+    };
+    match home.remove_room("not_existed_room") {
+        Ok(_) => println!("Room: '{}' has been deleted", "not_existed_room"),
+        Err(err) => match err {
+            HomeError::NoRoomInHoom(_) => println!("No '{}' in home", second_room_name),
+            _ => println!("Unknown ERROR!"),
+        },
+    };
+
     home.remove_device(&"not_existed_room".to_string(), "socket2");
     home.remove_device(&second_room_name, "not_existed_socket");
 
