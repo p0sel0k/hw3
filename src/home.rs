@@ -119,7 +119,10 @@ impl Room {
 
     fn devices_state(&self) -> Result<()> {
         for device in &self.devices {
-            device.1.print_state()?
+            device
+                .1
+                .print_state()
+                .context(format!("Can't  use device: '{}'", device.0))?
         }
         Ok(())
     }
