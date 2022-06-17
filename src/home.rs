@@ -77,12 +77,11 @@ impl Home {
         &mut self,
         room_name: &str,
         device_name: &str,
-    ) -> Option<Box<dyn SmartDevice>> {
+    ) -> Result<Box<dyn SmartDevice>, HomeError> {
         match self.get_room(room_name) {
             Ok(room) => return room.remove_device(device_name),
-            Err(e) => println!("Error: {}", e),
+            Err(e) => Err(e),
         }
-        None
     }
 
     pub fn print_all_info(&self) {
@@ -126,12 +125,14 @@ impl Room {
         None
     }
 
-    fn remove_device(&mut self, name: &str) -> Option<Box<dyn SmartDevice>> {
+    fn remove_device(&mut self, name: &str) -> Result<Box<dyn SmartDevice>, HomeError> {
         match self.devices.remove(name) {
-            Some(device) => return Some(device),
-            None => println!(">> There is no '{}' in room: '{}'", name, self.name),
+            Some(device) => return Ok(device),
+            None => Err(HomeError::NoDeviceInRoom(format!(
+                ">> There is no '{}' in room: '{}'",
+                name, self.name
+            ))),
         }
-        None
     }
 
     fn devices_state(&self) {
@@ -171,8 +172,8 @@ mod test {
         let device = Box::new(create_device());
         room.add_device(device);
         match room.remove_device("test_device") {
-            Some(_) => (),
-            None => panic!("Can't remove device!!!"),
+            Ok(_) => (),
+            Err(e) => panic!("Error: {}", e),
         }
     }
 
@@ -182,8 +183,8 @@ mod test {
         let device = Box::new(create_device());
         room.add_device(device);
         match room.remove_device("non-existent_device") {
-            Some(_) => panic!("Can't remove non-existent device!!!"),
-            None => (),
+            Ok(_) => panic!("Can't remove non-existent device!!!"),
+            Err(_) => (),
         }
     }
 }
