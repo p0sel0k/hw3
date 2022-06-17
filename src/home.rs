@@ -1,26 +1,21 @@
 use crate::devices::SmartDevice;
+use anyhow::{Context, Result};
 use std::collections::HashMap;
-use std::error::Error;
-use std::fmt::Display;
+use thiserror::Error;
+// use std::error::Error;
+// use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum HomeError {
-    NoRoomInHoom(String),
-    NoDeviceInRoom(String),
+    #[error("No Room In Home")]
+    NoRoomInHoom,
+
+    #[error("No Device In Room")]
+    NoDeviceInRoom,
+
+    #[error("Can't Add Room")]
     CantAddRoom,
 }
-
-impl Display for HomeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            HomeError::NoRoomInHoom(msg) => write!(f, "No Room In Home \nCause: {}", msg),
-            HomeError::NoDeviceInRoom(msg) => write!(f, "No Device In Room \nCause: {}", msg),
-            HomeError::CantAddRoom => write!(f, "Can't Add Room"),
-        }
-    }
-}
-
-impl Error for HomeError {}
 
 #[derive(Default)]
 pub struct Home {
@@ -41,35 +36,26 @@ impl Home {
         }
     }
 
-    pub fn add_device(
-        &mut self,
-        room_name: &str,
-        device: Box<dyn SmartDevice>,
-    ) -> Result<(), HomeError> {
+    pub fn add_device(&mut self, room_name: &str, device: Box<dyn SmartDevice>) -> Result<()> {
         let r = self.get_room(room_name)?;
         r.add_device(device);
         Ok(())
     }
 
-    pub fn get_room(&mut self, name: &str) -> Result<&mut Room, HomeError> {
+    pub fn get_room(&mut self, name: &str) -> Result<&mut Room> {
         for (room_name, room) in &mut self.rooms {
             if room_name == name {
                 return Ok(room);
             }
         }
-        Err(HomeError::NoRoomInHoom(format!(
-            "There is no room: '{}' in home",
-            name
-        )))
+        Err(HomeError::NoRoomInHoom).context(format!("room: {} doesn't exist in this home", name))
     }
 
-    pub fn remove_room(&mut self, name: &str) -> Result<Room, HomeError> {
+    pub fn remove_room(&mut self, name: &str) -> Result<Room> {
         match self.rooms.remove(name) {
             Some(room) => Ok(room),
-            None => Err(HomeError::NoRoomInHoom(format!(
-                "There is no room: '{}' in home",
-                name
-            ))),
+            None => Err(HomeError::NoRoomInHoom)
+                .context(format!("room: {} doesn't exist in this home", name)),
         }
     }
 
@@ -77,19 +63,17 @@ impl Home {
         &mut self,
         room_name: &str,
         device_name: &str,
-    ) -> Result<Box<dyn SmartDevice>, HomeError> {
-        match self.get_room(room_name) {
-            Ok(room) => return room.remove_device(device_name),
-            Err(e) => Err(e),
-        }
+    ) -> Result<Box<dyn SmartDevice>> {
+        self.get_room(room_name)?.remove_device(device_name)
     }
 
-    pub fn print_all_info(&self) {
+    pub fn print_all_info(&self) -> Result<()> {
         println!("\n---------Home Report--------");
         for (name, room) in &self.rooms {
             println!("Room {} info", name);
-            room.devices_state();
+            room.devices_state()?
         }
+        Ok(())
     }
 }
 
@@ -125,20 +109,19 @@ impl Room {
         None
     }
 
-    fn remove_device(&mut self, name: &str) -> Result<Box<dyn SmartDevice>, HomeError> {
+    fn remove_device(&mut self, name: &str) -> Result<Box<dyn SmartDevice>> {
         match self.devices.remove(name) {
-            Some(device) => return Ok(device),
-            None => Err(HomeError::NoDeviceInRoom(format!(
-                ">> There is no '{}' in room: '{}'",
-                name, self.name
-            ))),
+            Some(device) => Ok(device),
+            None => Err(HomeError::NoDeviceInRoom)
+                .context(format!("There is no '{}' in room '{}'", name, &self.name)),
         }
     }
 
-    fn devices_state(&self) {
+    fn devices_state(&self) -> Result<()> {
         for device in &self.devices {
-            device.1.print_state();
+            device.1.print_state()?
         }
+        Ok(())
     }
 }
 

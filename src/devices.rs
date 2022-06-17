@@ -1,28 +1,17 @@
-use std::error::Error;
-use std::fmt::Display;
+use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum DeviceError {
-    DeviceIsTurnedOff(&'static str),
+    #[error("Device is turned off")]
+    DeviceIsTurnedOff,
+
+    #[error("Unused Error")]
     UnusedError,
 }
 
-impl Display for DeviceError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            DeviceError::DeviceIsTurnedOff(msg) => {
-                write!(f, "Device Is Turned Off \n>>>> Cause: {}", msg)
-            }
-            DeviceError::UnusedError => write!(f, "UnusedError"),
-        }
-    }
-}
-
-impl Error for DeviceError {}
-
 pub trait SmartDevice {
     fn name(&self) -> &str;
-    fn print_state(&self);
+    fn print_state(&self) -> Result<(), DeviceError>;
 }
 
 pub struct SmartSocket {
@@ -52,7 +41,7 @@ impl SmartSocket {
         if self.is_switched_on {
             Ok(self.power)
         } else {
-            Err(DeviceError::DeviceIsTurnedOff("Socket is off"))
+            Err(DeviceError::DeviceIsTurnedOff)
         }
     }
 }
@@ -62,11 +51,14 @@ impl SmartDevice for SmartSocket {
         &self.name
     }
 
-    fn print_state(&self) {
+    fn print_state(&self) -> Result<(), DeviceError> {
         println!(">> Socket name is: {}", self.name());
         match self.power() {
-            Ok(p) => println!(">>>> Socket power is '{}'", p),
-            Err(e) => println!(">>>> Error: {}", e),
+            Ok(p) => {
+                println!(">>>> Socket power is '{}'", p);
+                Ok(())
+            }
+            Err(e) => Err(e),
         }
     }
 }
@@ -94,9 +86,10 @@ impl SmartDevice for SmartThermometer {
         &self.name
     }
 
-    fn print_state(&self) {
+    fn print_state(&self) -> Result<(), DeviceError> {
         println!(">> Thermometer name is: {}", self.name());
         println!(">>>> Themperature is: {}", self.get_temperature());
+        Ok(())
     }
 }
 

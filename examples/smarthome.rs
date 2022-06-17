@@ -1,11 +1,10 @@
-use std::error::Error;
-
+use anyhow::Result;
 use smarthome::{Home, Room};
 use smarthome::{SmartSocket, SmartThermometer};
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<()> {
     //create new home instance
-    let mut home = Home::new("home".to_string());
+    let mut home = Home::new("home".into());
 
     let first_room_name = String::from("first");
     let second_room_name = String::from("second");
@@ -25,7 +24,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     socket1.switch_on();
     socket2.switch_on();
-    socket3.switch_off();
+    socket3.switch_on();
 
     //add devices in room
     home.add_device(&first_room_name, Box::new(socket1))?;
@@ -33,17 +32,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     home.add_device(&first_room_name, Box::new(thermometer1))?;
     home.add_device(&first_room_name, Box::new(termometer2))?;
     home.add_device(&second_room_name, Box::new(socket3))?;
-    let _removed_room = home.remove_room(&first_room_name)?;
-    let _nonexisted_room = home.remove_room("not_existed_room")?;
+
+    // let _removed_room = home.remove_room(&first_room_name)?;
+    // let _nonexisted_room = home.remove_room("not_existed_room")?;
 
     //remove devices
-    let _socket_in_nonexisted_room = home.remove_device("not_existed_room", "socket2")?;
-    let _nonexisted_socket = home.remove_device(&second_room_name, "not_existed_socket")?;
+    // let _socket_in_nonexisted_room = home.remove_device("not_existed_room", "socket2")?;
+    // let _nonexisted_socket = home.remove_device(&second_room_name, "not_existed_socket")?;
 
     //print report about home (about existing devices)
-    home.print_all_info();
-
-    let _removed_socket2 = home.remove_device(&first_room_name, "socket2")?;
+    home.print_all_info()?;
 
     Ok(())
 }
