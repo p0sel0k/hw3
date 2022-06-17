@@ -168,9 +168,8 @@ mod test {
         let mut room = create_room();
         let device = Box::new(create_device());
         room.add_device(device);
-        match room.remove_device("non-existent_device") {
-            Ok(_) => panic!("Can't remove non-existent device!!!"),
-            Err(_) => (),
+        if room.remove_device("non-existent_device").is_ok() {
+            panic!("Can't remove non-existent device!!!")
         }
     }
 }
