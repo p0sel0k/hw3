@@ -1,0 +1,14 @@
+
+---------Home Report--------
+Room roomInput info>> Thermometer name is: thermo4545
+>>>> Themperature is: 25
+Room first info>> Thermometer name is: t2
+>>>> Themperature is: 25
+>> Socket name is: socket2
+ >>>> Socket power is '220'
+>> Thermometer name is: t1
+>>>> Themperature is: 25
+>> Socket name is: socket1
+ >>>> Socket power is '220'
+Room second info>> Socket name is: socket3
+ >>>> Socket power is '220'

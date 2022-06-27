@@ -11,7 +11,7 @@ pub enum DeviceError {
 
 pub trait SmartDevice {
     fn name(&self) -> &str;
-    fn print_state(&self) -> Result<(), DeviceError>;
+    fn print_state(&self) -> Result<String, DeviceError>;
 }
 
 pub struct SmartSocket {
@@ -51,13 +51,13 @@ impl SmartDevice for SmartSocket {
         &self.name
     }
 
-    fn print_state(&self) -> Result<(), DeviceError> {
-        println!(">> Socket name is: {}", self.name());
+    fn print_state(&self) -> Result<String, DeviceError> {
         match self.power() {
-            Ok(p) => {
-                println!(">>>> Socket power is '{}'", p);
-                Ok(())
-            }
+            Ok(p) => Ok(format!(
+                ">> Socket name is: {}\n>>>> Socket power is '{}'\n",
+                self.name(),
+                p
+            )),
             Err(e) => Err(e),
         }
     }
@@ -86,10 +86,12 @@ impl SmartDevice for SmartThermometer {
         &self.name
     }
 
-    fn print_state(&self) -> Result<(), DeviceError> {
-        println!(">> Thermometer name is: {}", self.name());
-        println!(">>>> Themperature is: {}", self.get_temperature());
-        Ok(())
+    fn print_state(&self) -> Result<String, DeviceError> {
+        Ok(format!(
+            ">> Thermometer name is: {}\n>>>> Themperature is: {}\n",
+            self.name,
+            self.get_temperature(),
+        ))
     }
 }
 

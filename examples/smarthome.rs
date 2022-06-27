@@ -1,3 +1,5 @@
+use std::fs::File;
+
 use anyhow::Result;
 use smarthome::{Home, Room};
 use smarthome::{SmartSocket, SmartThermometer};
@@ -8,6 +10,7 @@ fn main() -> Result<()> {
 
     let first_room_name = String::from("first");
     let second_room_name = String::from("second");
+    println!("{}", home.input_new_room()?);
 
     let first_room = Room::new(first_room_name.clone());
     let second_room = Room::new(second_room_name.clone());
@@ -26,6 +29,8 @@ fn main() -> Result<()> {
     socket2.switch_on();
     socket3.switch_on();
 
+    home.input_new_device()?;
+
     //add devices in room
     home.add_device(&first_room_name, Box::new(socket1))?;
     home.add_device(&first_room_name, Box::new(socket2))?;
@@ -41,7 +46,8 @@ fn main() -> Result<()> {
     // let _nonexisted_socket = home.remove_device(&second_room_name, "not_existed_socket")?;
 
     //print report about home (about existing devices)
-    home.print_all_info()?;
+    let file = File::create("./home_report.txt")?;
+    home.write_report(file)?;
 
     Ok(())
 }
