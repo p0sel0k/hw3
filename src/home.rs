@@ -218,12 +218,11 @@ impl Room {
 
     fn devices_state(&self) -> Result<String> {
         let mut room_report = String::new();
-        for device in &self.devices {
+        for (name, device) in &self.devices {
             room_report.push_str(
                 device
-                    .1
                     .print_state()
-                    .context(format!("Can't  use device: '{}'", device.0))?
+                    .context(format!("Can't  use device: '{}'", name))?
                     .as_str(),
             )
         }
