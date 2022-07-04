@@ -1,16 +1,17 @@
-use thiserror::Error;
+pub use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum DeviceError {
     #[error("Device is turned off")]
     DeviceIsTurnedOff,
 
-    #[error("Unused Error")]
-    UnusedError,
+    #[error("Return state error")]
+    ReturnState,
 }
 
 pub trait SmartDevice {
     fn name(&self) -> &str;
+    fn return_state(&self) -> Result<String, DeviceError>;
     fn print_state(&self) -> Result<String, DeviceError>;
 }
 
@@ -61,6 +62,16 @@ impl SmartDevice for SmartSocket {
             Err(e) => Err(e),
         }
     }
+
+    fn return_state(&self) -> Result<String, DeviceError> {
+        let str = format!(
+            "name: {}, is_switched_on: {}, power: {}",
+            self.name(),
+            self.is_switched_on,
+            self.power()?
+        );
+        Ok(str)
+    }
 }
 
 pub struct SmartThermometer {
@@ -92,6 +103,15 @@ impl SmartDevice for SmartThermometer {
             self.name,
             self.get_temperature(),
         ))
+    }
+
+    fn return_state(&self) -> Result<String, DeviceError> {
+        let str = format!(
+            "name: {}, temperature: {}",
+            self.name,
+            self.get_temperature()
+        );
+        Ok(str)
     }
 }
 
