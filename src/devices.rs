@@ -7,12 +7,16 @@ pub enum DeviceError {
 
     #[error("Return state error")]
     ReturnState,
+
+    #[error("Can't switch on/off this device")]
+    SwitchOnOffError,
 }
 
 pub trait SmartDevice {
     fn name(&self) -> &str;
     fn return_state(&self) -> Result<String, DeviceError>;
     fn print_state(&self) -> Result<String, DeviceError>;
+    fn switch_device(&mut self) -> Result<String, DeviceError>;
 }
 
 pub struct SmartSocket {
@@ -64,13 +68,19 @@ impl SmartDevice for SmartSocket {
     }
 
     fn return_state(&self) -> Result<String, DeviceError> {
-        let str = format!(
-            "name: {}, is_switched_on: {}, power: {}",
-            self.name(),
-            self.is_switched_on,
-            self.power()?
-        );
+        let str = format!("power: {}", self.power()?);
         Ok(str)
+    }
+
+    fn switch_device(&mut self) -> Result<String, DeviceError> {
+        let result = if self.is_switched_on {
+            self.switch_off();
+            "On"
+        } else {
+            self.switch_on();
+            "Off"
+        };
+        Ok(result.into())
     }
 }
 
@@ -106,12 +116,12 @@ impl SmartDevice for SmartThermometer {
     }
 
     fn return_state(&self) -> Result<String, DeviceError> {
-        let str = format!(
-            "name: {}, temperature: {}",
-            self.name,
-            self.get_temperature()
-        );
+        let str = format!("temperature: {}", self.get_temperature());
         Ok(str)
+    }
+
+    fn switch_device(&mut self) -> Result<String, DeviceError> {
+        Err(DeviceError::SwitchOnOffError)
     }
 }
 

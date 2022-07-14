@@ -199,10 +199,10 @@ impl Room {
         self.devices.insert(device.name().to_string(), device);
     }
 
-    fn get_device(&mut self, name: &str) -> Option<&dyn SmartDevice> {
-        for (device_name, device) in &self.devices {
+    pub fn get_device(&mut self, name: &str) -> Option<&mut dyn SmartDevice> {
+        for (device_name, device) in &mut self.devices {
             if device_name == name {
-                return Some(device.as_ref());
+                return Some(device.as_mut());
             }
         }
         None
