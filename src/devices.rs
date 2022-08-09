@@ -12,7 +12,7 @@ pub enum DeviceError {
     SwitchOnOffError,
 }
 
-pub trait SmartDevice {
+pub trait SmartDevice: Send + Sync {
     fn name(&self) -> &str;
     fn return_state(&self) -> Result<String, DeviceError>;
     fn print_state(&self) -> Result<String, DeviceError>;
@@ -93,7 +93,7 @@ impl SmartThermometer {
     pub fn new(name: String) -> Self {
         SmartThermometer {
             name,
-            temperature: 25,
+            temperature: 26,
         }
     }
 
